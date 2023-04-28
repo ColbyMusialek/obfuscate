@@ -4,13 +4,14 @@ import string
 import random
 import re
 from typing import List, Tuple
+import ast
 
 def obf_funcs(line:str,obf_iter:int,keys:List[Tuple[int, chr]]):
     """
     This function takes in a line and will obfuscate the functions and function calls.
     A function call will be obfuscated in the case that it exists in the keys list of tuples otherwise it is ignored
 
-    Return: a line (modified if necessary), the current obfuscation iteration, the keys list
+    Return: a line (modified if necessary), the current function obfuscation iteration, the keys list
     """
     
     for key in keys:
@@ -31,6 +32,19 @@ def obf_funcs(line:str,obf_iter:int,keys:List[Tuple[int, chr]]):
     
     return line,obf_iter,keys
 
+def obf_vars(line):
+    if not line.strip():  # Skip empty lines
+        return set()
+    if not line.endswith('\n'):  # Add a newline character if not present
+        line += '\n'
+    tree = ast.parse(line)
+    variables = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Name):
+            if isinstance(node.ctx, ast.Store):
+                variables.add(node.id)
+    return variables
+
 
 def make_copy(filename:string):
     """
@@ -39,7 +53,12 @@ def make_copy(filename:string):
     obf_funcs_iter: int = 0
     keys:List[Tuple[int, str]] = []
     with open(filename,'r') as file_1, open('new.py','w') as new:
+
         for line in file_1:
+            print(line)
+            print(obf_vars(line))
+
+
             newL_iter = obf_funcs(line,obf_funcs_iter,keys)
             line = newL_iter[0]
             obf_funcs_iter = newL_iter[1]
