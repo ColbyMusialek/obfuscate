@@ -5,7 +5,7 @@ import random
 import re
 from typing import List, Tuple
 
-def obf_funcs(line:str,obf_iter:int,keys:List[Tuple[int, chr]]) -> (string,int,List[Tuple[int, chr]]):
+def obf_funcs(line:str,obf_iter:int,keys:List[Tuple[int, chr]]):
     """
     This function takes in a line and will obfuscate the functions and function calls.
     A function call will be obfuscated in the case that it exists in the keys list of tuples otherwise it is ignored
